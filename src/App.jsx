@@ -1,16 +1,3 @@
-const initialIssues = [
-  {
-    id: 1, status: 'New', owner: 'Ravan', effort: 5,
-    created: new Date('2018-08-15'), due: undefined,
-    title: 'Error in console when clicking Add',
-  },
-  {
-    id: 2, status: 'Assigned', owner: 'Eddie', effort: 14,
-    created: new Date('2018-08-16'), due: new Date('2018-08-30'),
-    title: 'Missing bottom border on panel',
-  },
-];
-
 class IssueFilter extends React.Component {
   render() {
     return (
@@ -96,17 +83,37 @@ class IssueList extends React.Component {
   }
 
   loadData() {
-    setTimeout(() => {
-      this.setState({ issues: initialIssues });
-    }, 2000);
+    fetch('/api/issues').then(response =>
+      response.json()
+    ).then(data => {
+      console.log("Total count of records:", data._metadata.total_count);
+      data.records.forEach(issue => {
+        issue.created = new Date(issue.created);
+        if (issue.due)
+          issue.due = new Date(issue.due);
+      });
+      this.setState({ issues: data.records });
+    }).catch(err => {
+      console.log(err);
+    });
   }
 
-  createIssue(issue) {
-    issue.id = this.state.issues.length + 1;
-    issue.created = new Date();
-    const newIssueList = this.state.issues.slice();
-    newIssueList.push(issue);
-    this.setState({ issues: newIssueList });
+
+  createIssue(newIssue) {
+    fetch('/api/issues', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newIssue),
+    }).then(response =>                                                                            response.json()
+    ).then(updatedIssue => {
+      updatedIssue.created = new Date(updatedIssue.created);
+      if (updatedIssue.due)
+        updatedIssue.due = new Date(updatedIssue.due);
+      const newIssues = this.state.issues.concat(updatedIssue);
+      this.setState({ issues: newIssues });
+    }).catch(err => {
+      alert("Error in sending data to server: " + err.message);
+    });
   }
 
   render() {
