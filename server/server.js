@@ -54,6 +54,20 @@ function validateIssue(issue) {
   return null;
 }
 
+function issueAdd(res, issue) {
+  issue.id = issues.length + 1;
+  issue.created = new Date();
+  if (!issue.status)
+    issue.status = 'New';
+  const err = validateIssue(issue)
+  if (err) {
+    res.status(422).json({ message: `Invalid requrest: ${err}` });
+    return;
+  }
+  issues.push(issue);
+  res.json(issue);
+}
+
 app.get('/hello', (req, res) => {
   res.send('Hello World');
 });
@@ -63,21 +77,10 @@ app.get('/api/issues', (req, res) => {
   res.json({ _metadata: metadata, records: issues });
 });
 
-app.post('/api/issues', (req, res) => {
+app.post('/api/issues', (req, res, next) => {
   const newIssue = req.body;
-  newIssue.id = issues.length + 1;
-  newIssue.created = new Date();
-  if (!newIssue.status)
-    newIssue.status = 'New';
-
-  const err = validateIssue(newIssue)
-  if (err) {
-    res.status(422).json({ message: `Invalid requrest: ${err}` });
-    return;
-  }
-  issues.push(newIssue);
-
-  res.json(newIssue);
+  issueAdd(res, newIssue);
+  next();
 });
 
 

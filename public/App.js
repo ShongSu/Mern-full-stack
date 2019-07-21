@@ -1,5 +1,9 @@
 "use strict";
 
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -17,6 +21,13 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+var dateRegex = new RegExp('^\\d\\d\\d\\d-\\d\\d-\\d\\d');
+
+function jsonDateReviver(key, value) {
+  if (dateRegex.test(value)) return new Date(value);
+  return value;
+}
 
 var IssueFilter =
 /*#__PURE__*/
@@ -131,57 +142,110 @@ function (_React$Component3) {
     }
   }, {
     key: "loadData",
-    value: function loadData() {
-      var _this3 = this;
+    value: function () {
+      var _loadData = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee() {
+        var response, body, result;
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.prev = 0;
+                _context.next = 3;
+                return fetch('/api/issues');
 
-      fetch('/api/issues').then(function (response) {
-        return response.json();
-      }).then(function (data) {
-        console.log("Total count of records:", data._metadata.total_count);
-        data.records.forEach(function (issue) {
-          issue.created = new Date(issue.created);
-          if (issue.due) issue.due = new Date(issue.due);
-        });
+              case 3:
+                response = _context.sent;
+                _context.next = 6;
+                return response.text();
 
-        _this3.setState({
-          issues: data.records
-        });
-      }).catch(function (err) {
-        console.log(err);
-      });
-    }
+              case 6:
+                body = _context.sent;
+                result = JSON.parse(body, jsonDateReviver);
+                this.setState({
+                  issues: result.records
+                });
+                _context.next = 14;
+                break;
+
+              case 11:
+                _context.prev = 11;
+                _context.t0 = _context["catch"](0);
+                console.log(_context.t0);
+
+              case 14:
+                ;
+
+              case 15:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this, [[0, 11]]);
+      }));
+
+      function loadData() {
+        return _loadData.apply(this, arguments);
+      }
+
+      return loadData;
+    }()
   }, {
     key: "createIssue",
-    value: function createIssue(newIssue) {
-      var _this4 = this;
+    value: function () {
+      var _createIssue = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee2(newIssue) {
+        var response, body, result, newIssues;
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                _context2.next = 2;
+                return fetch('/api/issues', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(newIssue)
+                });
 
-      fetch('/api/issues', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(newIssue)
-      }).then(function (response) {
-        if (response.ok) {
-          response.json().then(function (updatedIssue) {
-            updatedIssue.created = new Date(updatedIssue.created);
-            if (updatedIssue.due) updatedIssue.due = new Date(updatedIssue.due);
+              case 2:
+                response = _context2.sent;
+                _context2.next = 5;
+                return response.text();
 
-            var newIssues = _this4.state.issues.concat(updatedIssue);
+              case 5:
+                body = _context2.sent;
+                result = JSON.parse(body, jsonDateReviver);
 
-            _this4.setState({
-              issues: newIssues
-            });
-          });
-        } else {
-          response.json().then(function (error) {
-            alert("Failed to add issue: " + error.message);
-          });
-        }
-      }).catch(function (err) {
-        alert("Error in sending data to server: " + err.message);
-      });
-    }
+                if (response.ok) {
+                  newIssues = this.state.issues.concat(result);
+                  this.setState({
+                    issues: newIssues
+                  });
+                } else {
+                  response.json().then(function (error) {
+                    alert("Failed to add issue: " + error.message);
+                  });
+                } //this.loadData();
+
+
+              case 8:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      function createIssue(_x) {
+        return _createIssue.apply(this, arguments);
+      }
+
+      return createIssue;
+    }()
   }, {
     key: "render",
     value: function render() {

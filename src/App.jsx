@@ -1,3 +1,9 @@
+const dateRegex = new RegExp('^\\d\\d\\d\\d-\\d\\d-\\d\\d');
+function jsonDateReviver(key, value) {
+  if (dateRegex.test(value)) return new Date(value);
+  return value;
+}
+
 class IssueFilter extends React.Component {
   render() {
     return (
@@ -82,44 +88,37 @@ class IssueList extends React.Component {
     this.loadData();
   }
 
-  loadData() {
-    fetch('/api/issues').then(response =>
-      response.json()
-    ).then(data => {
-      console.log("Total count of records:", data._metadata.total_count);
-      data.records.forEach(issue => {
-        issue.created = new Date(issue.created);
-        if (issue.due)
-          issue.due = new Date(issue.due);
-      });
-      this.setState({ issues: data.records });
-    }).catch(err => {
+  async loadData() {
+    try {
+      const response = await fetch('/api/issues');
+      const body = await response.text();
+      const result = JSON.parse(body, jsonDateReviver);
+
+      this.setState({ issues: result.records });
+    } catch (err) {
       console.log(err);
-    });
+    };
   }
 
-  createIssue(newIssue) {
-    fetch('/api/issues', {
+  async createIssue(newIssue) {
+    const response = await fetch('/api/issues', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newIssue                                                                                              ),
-    }).then(response => {
-      if (response.ok) {
-        response.json().then(updatedIssue => {
-          updatedIssue.created = new Date(updatedIssue.created);
-          if (updatedIssue.due)
-            updatedIssue.due = new Date(updatedIssue.due);
-          const newIssues = this.state.issues.concat(updatedIssue);
-          this.setState({ issues: newIssues });
-        });
-      } else {
-        response.json().then(error => {
-          alert("Failed to add issue: " + error.message)
-        });
-      }
-    }).catch(err => {
-      alert("Error in sending data to server: " + err.message);
+      body: JSON.stringify(newIssue),
     });
+    const body = await response.text();
+    const result = JSON.parse(body, jsonDateReviver);
+
+    if (response.ok) {
+      const newIssues = this.state.issues.concat(result);
+      this.setState({ issues: newIssues });
+    } else {
+      response.json().then(error => {
+        alert("Failed to add issue: " + error.message)
+      });
+    }
+
+    //this.loadData();
   }
 
   render() {
