@@ -101,24 +101,23 @@ class IssueList extends React.Component {
   }
 
   async createIssue(newIssue) {
-    const response = await fetch('/api/issues', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newIssue),
-    });
-    const body = await response.text();
-    const result = JSON.parse(body, jsonDateReviver);
-
-    if (response.ok) {
-      const newIssues = this.state.issues.concat(result);
-      this.setState({ issues: newIssues });
-    } else {
-      response.json().then(error => {
-        alert("Failed to add issue: " + error.message)
+    try {
+      const response = await fetch('/api/issues', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newIssue),
       });
+      const body = await response.text();
+      const result = JSON.parse(body, jsonDateReviver);
+      if (response.ok) {
+        const newIssues = this.state.issues.concat(result);
+        this.setState({ issues: newIssues });
+      } else {        
+        alert("Failed to add issue: " + result.message)
+      }
+    } catch (e) {
+      alert(`Error in sending data to server: ${e.message}`);
     }
-
-    //this.loadData();
   }
 
   render() {

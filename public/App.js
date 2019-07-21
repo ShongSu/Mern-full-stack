@@ -202,7 +202,8 @@ function (_React$Component3) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                _context2.next = 2;
+                _context2.prev = 0;
+                _context2.next = 3;
                 return fetch('/api/issues', {
                   method: 'POST',
                   headers: {
@@ -211,12 +212,12 @@ function (_React$Component3) {
                   body: JSON.stringify(newIssue)
                 });
 
-              case 2:
+              case 3:
                 response = _context2.sent;
-                _context2.next = 5;
+                _context2.next = 6;
                 return response.text();
 
-              case 5:
+              case 6:
                 body = _context2.sent;
                 result = JSON.parse(body, jsonDateReviver);
 
@@ -226,18 +227,23 @@ function (_React$Component3) {
                     issues: newIssues
                   });
                 } else {
-                  response.json().then(function (error) {
-                    alert("Failed to add issue: " + error.message);
-                  });
-                } //this.loadData();
+                  alert("Failed to add issue: " + result.message);
+                }
 
+                _context2.next = 14;
+                break;
 
-              case 8:
+              case 11:
+                _context2.prev = 11;
+                _context2.t0 = _context2["catch"](0);
+                alert("Error in sending data to server: ".concat(_context2.t0.message));
+
+              case 14:
               case "end":
                 return _context2.stop();
             }
           }
-        }, _callee2, this);
+        }, _callee2, this, [[0, 11]]);
       }));
 
       function createIssue(_x) {
