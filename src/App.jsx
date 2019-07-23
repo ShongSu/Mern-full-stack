@@ -93,8 +93,7 @@ class IssueList extends React.Component {
       const response = await fetch('/api/issues');
       const body = await response.text();
       const result = JSON.parse(body, jsonDateReviver);
-
-      this.setState({ issues: result.records });
+      this.setState({ issues: result });
     } catch (err) {
       console.log(err);
     };

@@ -164,7 +164,7 @@ function (_React$Component3) {
                 body = _context.sent;
                 result = JSON.parse(body, jsonDateReviver);
                 this.setState({
-                  issues: result.records
+                  issues: result
                 });
                 _context.next = 14;
                 break;
