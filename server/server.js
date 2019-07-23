@@ -1,10 +1,14 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
+const { MongoClient } = require('mongodb');
 
 app.use(express.static('public'));
 app.use(bodyParser.json());
 
+
+const url = 'mongodb://localhost/issuetracker';
+let db;
 
 const issues = [
   {
@@ -68,13 +72,18 @@ function issueAdd(res, issue) {
   res.json(issue);
 }
 
+function issueList(res) {
+  const metadata = { total_count: issues.length };
+  res.json({ _metadata: metadata, records: issues });
+}
+
 app.get('/hello', (req, res) => {
   res.send('Hello World');
 });
 
 app.get('/api/issues', (req, res) => {
-  const metadata = { total_count: issues.length };
-  res.json({ _metadata: metadata, records: issues });
+  issueList(res);
+  next();
 });
 
 app.post('/api/issues', (req, res, next) => {
