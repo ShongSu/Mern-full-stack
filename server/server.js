@@ -19,14 +19,13 @@ async function getNextSequence(name) {
   return result.value.current;
 }
 
-async function issueAdd(res, issue) {
+async function issueAdd(issue) {
   issue.created = new Date();
   if (!issue.status)
     issue.status = 'New';
   const err = validateIssueV2(issue)
-  if (err) {    
-    res.status(422).json({ message: `Invalid requrest: ${err}` });
-    return;
+  if (err) {
+    return { message: `Invalid requrest: ${err}` };
   }
   issue.id = await getNextSequence('issues');
 
@@ -34,7 +33,7 @@ async function issueAdd(res, issue) {
   const savedIssue = await db.collection('issues')
     .findOne({ _id: result.insertedId });
 
-  res.json(savedIssue);
+  return savedIssue;
 }
 
 async function issueList() {
@@ -59,12 +58,18 @@ app.get('/api/issues', (req, res) => {
   })
 });
 
-app.post('/api/issues', (req, res, next) => {
+app.post('/api/issues', (req, res) => {
   const newIssue = req.body;
-  issueAdd(res, newIssue);
+  issueAdd(newIssue).then((result) => {    
+    if(result.message) {
+      res.status(422).json(result);
+      return;
+    }
+    res.send(result);
+  });
 });
 
-function validateIssueV2(issue ) {  
+function validateIssueV2(issue) {
   const errors = [];
   if (issue.title.length < 3) {
     errors.push('Field "title" must be at least 3 characters long.')
