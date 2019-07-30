@@ -1,3 +1,5 @@
+import React from 'react';
+
 import IssueFilter from './IssueFilter.jsx';
 import IssueTable from './IssueTable.jsx';
 import IssueAdd from './IssueAdd.jsx';
@@ -53,7 +55,7 @@ export default class IssueList extends React.Component {
     render() {
       return (
         <React.Fragment>
-          <h1>Issue Tracker</h1>
+          <h1>Issue Tracker V2</h1>
           <IssueFilter />
           <hr />
           <IssueTable issues={this.state.issues} />
