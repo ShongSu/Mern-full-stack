@@ -11,7 +11,9 @@ app.get('/hello', (req, res) => {
 });
 
 app.get('/api/issues', (req, res) => {
-  issue.issueList().then(issues => {
+  const filter = {};              
+  if (req.query.status) filter.status = req.query.status;  
+  issue.issueList(filter).then(issues => {
     res.send(issues);
   })
 });
