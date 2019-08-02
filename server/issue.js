@@ -1,6 +1,13 @@
 const { getDb, getNextSequence } = require('./db.js');
 
-async function issueList({status}) {
+
+async function get(id) {
+    const db = getDb();        
+    const issue = await db.collection('issues').findOne({ id: id });        
+    return issue;
+}
+
+async function issueList({ status }) {
     const db = getDb();
     const filter = {};
     if (status) filter.status = status;
@@ -39,4 +46,4 @@ async function issueAdd(issue) {
     return savedIssue;
 }
 
-module.exports = { issueList, issueAdd };
+module.exports = { issueList, issueAdd, get };

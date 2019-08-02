@@ -4,6 +4,8 @@ import IssueFilter from './IssueFilter.jsx';
 import IssueTable from './IssueTable.jsx';
 import IssueAdd from './IssueAdd.jsx';
 import URLSearchParams from 'url-search-params';
+import { Route } from 'react-router-dom';
+import IssueDetail from './IssueDetail.jsx';
 
 const dateRegex = new RegExp('^\\d\\d\\d\\d-\\d\\d-\\d\\d');
 function jsonDateReviver(key, value) {
@@ -33,9 +35,9 @@ export default class IssueList extends React.Component {
   async loadData() {
     const { location: { search } } = this.props;
     const params = new URLSearchParams(search);
-    
+
     try {
-      const response = await fetch(`/api/issues?` + params,);
+      const response = await fetch(`/api/issues?` + params);      
       const body = await response.text();
       const result = JSON.parse(body, jsonDateReviver);
       this.setState({ issues: result });
@@ -65,14 +67,19 @@ export default class IssueList extends React.Component {
   }
 
   render() {
+    const { issues } = this.state;
+    const { match } = this.props;    
+
     return (
       <React.Fragment>
         <h1>Issue Tracker V2</h1>
         <IssueFilter />
         <hr />
-        <IssueTable issues={this.state.issues} />
+        <IssueTable issues={issues} />
         <hr />
         <IssueAdd createIssue={this.createIssue} />
+        <hr />
+        <Route path={`${match.path}/:id`} component={IssueDetail} />
       </React.Fragment>
     );
   }

@@ -18,6 +18,13 @@ app.get('/api/issues', (req, res) => {
   })
 });
 
+app.get('/api/issues/:id', (req, res) => {
+  const id = req.params.id;        
+  issue.get(+id).then(issue => {  
+    res.send(issue);
+  })
+});
+
 app.post('/api/issues', (req, res) => {
   const newIssue = req.body;
   issue.issueAdd(newIssue).then((result) => {    
