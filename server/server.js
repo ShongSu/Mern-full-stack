@@ -12,7 +12,10 @@ app.get('/hello', (req, res) => {
 
 app.get('/api/issues', (req, res) => {
   const filter = {};              
-  if (req.query.status) filter.status = req.query.status;  
+  if (req.query.status) filter.status = req.query.status;
+  if (req.query.effortMin) filter.effortMin = req.query.effortMin;  
+  if (req.query.effortMax) filter.effortMax = req.query.effortMax;  
+
   issue.issueList(filter).then(issues => {
     res.send(issues);
   })
