@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import NumInput from './NumInput.jsx';
 const dateRegex = new RegExp('^\\d\\d\\d\\d-\\d\\d-\\d\\d');
 function jsonDateReviver(key, value) {
     if (dateRegex.test(value)) return new Date(value);
@@ -26,8 +27,9 @@ export default class IssueEdit extends React.Component {
       this.loadData();
     }
   }
-  onChange(event) {
-    const { name, value } = event.target;
+  onChange(event, naturalValue) {
+    const { name, value: textValue } = event.target;
+    const value = naturalValue === undefined ? textValue : naturalValue;
     this.setState(prevState => ({
       issue: { ...prevState.issue, [name]: value },
     }));
@@ -102,10 +104,11 @@ export default class IssueEdit extends React.Component {
             <tr>
               <td>Effort:</td>
               <td>
-                <input
+                <NumInput
                   name="effort"
                   value={effort}
                   onChange={this.onChange}
+                  key={id}
                 />
               </td>
             </tr>
