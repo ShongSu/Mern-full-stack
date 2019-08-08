@@ -2,6 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import NumInput from './NumInput.jsx';
 import DateInput from './DateInput.jsx';
+import TextInput from './TextInput.jsx';
+
 const dateRegex = new RegExp('^\\d\\d\\d\\d-\\d\\d-\\d\\d');
 function jsonDateReviver(key, value) {
     if (dateRegex.test(value)) return new Date(value);
@@ -59,11 +61,13 @@ export default class IssueEdit extends React.Component {
       const body = await response.text();
       const result = JSON.parse(body, jsonDateReviver);
 
-      if (result) {
-        this.setState({ issue: result, invalidFields: {} });
-      } else {
-        this.setState({ issue: {}, invalidFields: {} });
-      }
+      // if (result) {
+      //   this.setState({ issue: result, invalidFields: {} });
+      // } else {
+      //   this.setState({ issue: {}, invalidFields: {} });
+      // }
+      this.setState({ issue: result ? result : {}, invalidFields: {} });
+
     } catch (err) {
       console.log(err);
     };
@@ -116,10 +120,11 @@ export default class IssueEdit extends React.Component {
             <tr>
               <td>Owner:</td>
               <td>
-                <input
+                <TextInput
                   name="owner"
                   value={owner}
                   onChange={this.onChange}
+                  key={id}
                 />
               </td>
             </tr>
@@ -149,23 +154,26 @@ export default class IssueEdit extends React.Component {
             <tr>
               <td>Title:</td>
               <td>
-                <input
+                <TextInput
                   size={50}
                   name="title"
                   value={title}
                   onChange={this.onChange}
+                  key={id}
                 />
               </td>
             </tr>
             <tr>
               <td>Description:</td>
               <td>
-                <textarea
+                <TextInput
+                  tag="textarea"
                   rows={8}
                   cols={50}
                   name="description"
                   value={description}
                   onChange={this.onChange}
+                  key={id}
                 />
               </td>
             </tr>
